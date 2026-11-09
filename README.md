@@ -81,7 +81,7 @@ This runs:
 
 ## Deploy to Render
 
-1. In Render: **New + → Blueprint**, then select this repository. `render.yaml` defines the web service.
+1. The Render service uses the **Docker** runtime (`Dockerfile`). For a new setup: **New + → Blueprint**, then select this repository; `render.yaml` defines the web service. For the existing `Housing-fund` service, just set the variables below.
 2. Fill in the environment variables when prompted (see `.env.example`):
    - `FIREBASE_PROJECT_ID`, `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_APP_ID` (public web config)
    - `FIREBASE_SERVICE_ACCOUNT`: paste the service-account JSON, or base64 of it
