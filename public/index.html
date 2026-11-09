@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16834b">
+<title>صندوق السكن</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+<link rel="stylesheet" href="/styles.css">
+<script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+<div id="netBanner" class="banner hidden" role="status">أنت غير متصل بالإنترنت — رح نحدّث البيانات أول ما يرجع الاتصال</div>
+<main class="wrap">
+  <header class="top">
+    <h1>🏠 صندوق السكن</h1>
+    <div id="userChip" class="user-chip hidden">
+      <span id="userName"></span>
+      <button id="renameBtn" type="button" class="link">تعديل الاسم</button>
+      <button id="logoutBtn" type="button" class="link">خروج</button>
+    </div>
+  </header>
+
+  <section id="loadingView" class="card center muted">جاري التحميل…</section>
+
+  <!-- Sign in / sign up -->
+  <section id="authView" class="card narrow hidden">
+    <div class="tabs">
+      <button id="loginTab" type="button">تسجيل الدخول</button>
+      <button id="signupTab" type="button" class="secondary">حساب جديد</button>
+    </div>
+    <form id="authForm" novalidate>
+      <div id="nameWrap" class="hidden">
+        <label for="authName">الاسم</label>
+        <input id="authName" maxlength="60" autocomplete="name" placeholder="مثلاً: أحمد">
+      </div>
+      <label for="authEmail">البريد الإلكتروني</label>
+      <input id="authEmail" type="email" dir="ltr" autocomplete="email" required>
+      <label for="authPassword">كلمة السر</label>
+      <input id="authPassword" type="password" dir="ltr" minlength="6" autocomplete="current-password" required>
+      <button id="authSubmit" type="submit">دخول</button>
+    </form>
+    <button id="resetBtn" type="button" class="link small">نسيت كلمة السر؟</button>
+    <div class="divider"><span>أو</span></div>
+    <button id="googleBtn" type="button" class="secondary">الدخول بحساب Google</button>
+    <p class="muted small">الدخول متاح فقط للأعضاء اللي أضافهم مسؤول الصندوق.</p>
+  </section>
+
+  <!-- Email verification -->
+  <section id="verifyView" class="card narrow center hidden">
+    <h2>أكّد بريدك الإلكتروني</h2>
+    <p>بعثنالك رابط تأكيد على <strong id="verifyEmail" dir="ltr"></strong>. افتح الرابط وبعدين اضغط "تم التأكيد".</p>
+    <button id="verifiedBtn" type="button">تم التأكيد</button>
+    <button id="resendBtn" type="button" class="secondary">إعادة إرسال الرابط</button>
+  </section>
+
+  <!-- Not a member -->
+  <section id="deniedView" class="card narrow center hidden">
+    <h2>ما عندك صلاحية</h2>
+    <p id="deniedMsg"></p>
+    <p class="muted small">البريد المستخدم: <span id="deniedEmail" dir="ltr"></span></p>
+    <button id="retryBtn" type="button">حاول مرة ثانية</button>
+  </section>
+
+  <!-- Main app -->
+  <div id="appView" class="layout hidden">
+    <div class="col">
+      <section class="card balance">
+        <div class="muted">الرصيد المتبقي</div>
+        <div id="balance" class="money">0.00 د.أ</div>
+        <div id="syncState" class="muted small">متزامن مع جميع الأعضاء</div>
+      </section>
+      <div class="stats">
+        <section class="card"><div class="muted">إجمالي الإيداعات</div><div id="income" class="stat">0.00 د.أ</div></section>
+        <section class="card"><div class="muted">إجمالي المصاريف</div><div id="spent" class="stat">0.00 د.أ</div></section>
+      </div>
+      <section class="card">
+        <div class="tabs">
+          <button id="expenseTab" type="button">إضافة مصروف</button>
+          <button id="incomeTab" type="button" class="secondary">إضافة مبلغ</button>
+        </div>
+        <form id="txForm" novalidate>
+          <div id="itemWrap">
+            <label for="item">شو اشتريت؟</label>
+            <input id="item" maxlength="120" placeholder="مثلاً: مواد تنظيف" required>
+          </div>
+          <div id="noteWrap" class="hidden">
+            <label for="note">ملاحظة (اختياري)</label>
+            <input id="note" maxlength="120" placeholder="مثلاً: دفعة شهر 11">
+          </div>
+          <label for="amount">المبلغ (دينار أردني)</label>
+          <input id="amount" inputmode="decimal" autocomplete="off" placeholder="0.00" required>
+          <p class="muted small">رح تنسجل العملية باسم: <strong id="asName"></strong></p>
+          <button id="txSubmit" type="submit">تسجيل المصروف</button>
+        </form>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card">
+        <div class="row-between">
+          <h2>آخر العمليات</h2>
+          <select id="filter" aria-label="تصفية العمليات" class="compact">
+            <option value="all">الكل</option>
+            <option value="expense">المصاريف</option>
+            <option value="deposit">الإيداعات</option>
+            <option value="mine">عملياتي</option>
+          </select>
+        </div>
+        <div id="history" class="empty">ما في عمليات لحد الآن</div>
+      </section>
+
+      <section id="membersCard" class="card">
+        <h2>الأعضاء</h2>
+        <div id="members"></div>
+      </section>
+
+      <section id="adminCard" class="card hidden">
+        <h2>إدارة الأعضاء</h2>
+        <form id="inviteForm" class="inline-form" novalidate>
+          <input id="inviteEmail" type="email" dir="ltr" placeholder="email@example.com" aria-label="بريد العضو الجديد" required>
+          <select id="inviteRole" aria-label="الصلاحية">
+            <option value="member">عضو</option>
+            <option value="admin">مسؤول</option>
+          </select>
+          <button type="submit">إضافة</button>
+        </form>
+        <div id="allowed"></div>
+        <h2 class="mt">سجل التدقيق</h2>
+        <div id="audit" class="audit"></div>
+      </section>
+    </div>
+  </div>
+  <p class="foot">البيانات محفوظة على السحابة ومتزامنة لحظياً بين جميع الأعضاء</p>
+</main>
+<div id="toast" class="toast hidden" role="alert"></div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# In Render: New + → Blueprint → pick this repo. You'll be prompted for the
+# values marked `sync: false` (see README "Deploy to Render").
+services:
+  - type: web
+    name: housing-fund
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_API_KEY
+        sync: false
+      - key: FIREBASE_AUTH_DOMAIN
+        sync: false
+      - key: FIREBASE_APP_ID
+        sync: false
+      # Service-account JSON (raw or base64). Secret — never commit it.
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+      # Comma-separated emails that are always admins (e.g. you).
+      - key: ADMIN_EMAILS
+        sync: false

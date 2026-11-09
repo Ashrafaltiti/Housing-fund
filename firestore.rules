@@ -1,0 +1,51 @@
+rules_version = '2';
+
+// Clients may only READ. Every write (balance, transactions, members, audit
+// log) goes through the server, which uses the Admin SDK inside atomic
+// Firestore transactions. This makes overspending and history tampering
+// impossible from the browser.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function memberDoc() {
+      return /databases/$(database)/documents/members/$(request.auth.uid);
+    }
+    function isMember() {
+      return signedIn() && exists(memberDoc()) && get(memberDoc()).data.active == true;
+    }
+    function isAdmin() {
+      return isMember() && get(memberDoc()).data.role == 'admin';
+    }
+
+    match /fund/{docId} {
+      allow read: if isMember();
+      allow write: if false;
+    }
+
+    match /transactions/{txId} {
+      allow read: if isMember();
+      allow write: if false;
+    }
+
+    match /members/{uid} {
+      allow read: if isMember() || (signedIn() && request.auth.uid == uid);
+      allow write: if false;
+    }
+
+    match /allowedEmails/{email} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /auditLog/{entryId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
