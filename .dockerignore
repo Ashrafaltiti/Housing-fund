@@ -1,0 +1,9 @@
+node_modules
+public/assets
+.git
+.github
+test
+*.log
+.env
+.env.*
+service-account*.json

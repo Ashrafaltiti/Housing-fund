@@ -3,19 +3,14 @@
 # values marked `sync: false` (see README "Deploy to Render").
 services:
   - type: web
-    name: housing-fund
-    runtime: node
+    name: Housing-fund
+    runtime: docker
+    dockerfilePath: ./Dockerfile
     plan: free
-    region: frankfurt
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: npm start
+    region: oregon
     healthCheckPath: /healthz
     autoDeploy: true
     envVars:
-      - key: NODE_VERSION
-        value: "22"
-      - key: NODE_ENV
-        value: production
       - key: FIREBASE_PROJECT_ID
         sync: false
       - key: FIREBASE_API_KEY
