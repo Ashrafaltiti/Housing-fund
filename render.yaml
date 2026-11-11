@@ -11,14 +11,9 @@ services:
     healthCheckPath: /healthz
     autoDeploy: true
     envVars:
-      - key: FIREBASE_PROJECT_ID
-        sync: false
-      - key: FIREBASE_API_KEY
-        sync: false
-      - key: FIREBASE_AUTH_DOMAIN
-        sync: false
-      - key: FIREBASE_APP_ID
-        sync: false
+      # Only FIREBASE_SERVICE_ACCOUNT and ADMIN_EMAILS are required. The project id
+      # comes from the service account, and the web config (FIREBASE_API_KEY,
+      # FIREBASE_APP_ID, FIREBASE_AUTH_DOMAIN) is looked up at startup unless set.
       # Service-account JSON (raw or base64). Secret — never commit it.
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false

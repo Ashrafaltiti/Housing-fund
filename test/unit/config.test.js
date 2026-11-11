@@ -35,3 +35,13 @@ test('readServiceAccount accepts raw JSON or base64', () => {
     else process.env.FIREBASE_SERVICE_ACCOUNT = prev;
   }
 });
+
+test('loadConfig: service account alone is enough (project id from it, web config looked up later)', () => {
+  const c = loadConfig({ ADMIN_EMAILS: 'a@x.dev', RENDER_EXTERNAL_HOSTNAME: 'fund.onrender.com' }, { project_id: 'sa-proj' });
+  assert.equal(c.projectId, 'sa-proj');
+  assert.equal(c.clientConfig.firebase.projectId, 'sa-proj');
+  assert.equal(c.clientConfig.firebase.apiKey, undefined);
+  assert.equal(c.publicHost, 'fund.onrender.com');
+  // Explicit env still wins.
+  assert.equal(loadConfig({ FIREBASE_PROJECT_ID: 'env-proj', FIREBASE_API_KEY: 'k' }, { project_id: 'sa-proj' }).projectId, 'env-proj');
+});
