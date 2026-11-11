@@ -13,6 +13,7 @@ COPY --from=build /app/package.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/server ./server
 COPY --from=build /app/public ./public
+COPY --from=build /app/firestore.rules ./firestore.rules
 USER node
 EXPOSE 10000
 CMD ["node", "server/index.js"]

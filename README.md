@@ -67,25 +67,25 @@ This runs:
 
 ## Firebase setup (one-time, needs your Firebase account)
 
-1. Create a project at <https://console.firebase.google.com>.
-2. **Firestore Database** → Create database (production mode).
-3. **Authentication** → Sign-in method → enable **Google** and/or **Email/Password**.
-4. **Project settings → General → Your apps** → add a **Web app**. Copy `apiKey`, `authDomain`, `projectId`, `appId`.
-5. **Project settings → Service accounts** → *Generate new private key*. This JSON file is a secret; never commit it.
-6. Deploy the security rules:
-   ```bash
-   npx firebase login
-   npx firebase deploy --only firestore:rules,firestore:indexes --project <your-project-id>
-   ```
-7. After deploying to Render, add your Render domain (e.g. `housing-fund.onrender.com`) under **Authentication → Settings → Authorized domains**.
+1. Create a project at <https://console.firebase.google.com> (the free Spark plan is enough).
+2. **Build → Firestore Database** → Create database (production mode).
+3. **Build → Authentication** → Get started → Sign-in method → enable **Google** and/or **Email/Password**.
+4. **Project settings → Service accounts** → *Generate new private key*. This JSON file is a secret; never commit it.
+
+On startup the server uses the service account to do the rest automatically:
+it reads the project id, looks up (or creates) the web app config, deploys `firestore.rules`,
+and adds the Render domain to **Authentication → Settings → Authorized domains**.
+If any of these fail, the log says what to do by hand
+(rules: `npx firebase deploy --only firestore:rules --project <id>`).
 
 ## Deploy to Render
 
-1. The Render service uses the **Docker** runtime (`Dockerfile`). For a new setup: **New + → Blueprint**, then select this repository; `render.yaml` defines the web service. For the existing `Housing-fund` service, just set the variables below.
-2. Fill in the environment variables when prompted (see `.env.example`):
-   - `FIREBASE_PROJECT_ID`, `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_APP_ID` (public web config)
+1. The Render service uses the **Docker** runtime (`Dockerfile`). For a new setup: **New + → Blueprint**, then select this repository; `render.yaml` defines the web service.
+2. Set two environment variables (see `.env.example`):
    - `FIREBASE_SERVICE_ACCOUNT`: paste the service-account JSON, or base64 of it
    - `ADMIN_EMAILS`: your email (comma-separate several). These accounts are always admins.
+
+   `FIREBASE_PROJECT_ID`, `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN` and `FIREBASE_APP_ID` are optional overrides.
 3. Deploy. The health check is `GET /healthz`.
 4. Open the site and sign in with an `ADMIN_EMAILS` address. Then add the other members' emails under **إدارة الأعضاء**. They sign in with those same emails.
 
